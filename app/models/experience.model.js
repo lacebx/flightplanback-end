@@ -1,60 +1,51 @@
-// app/models/flightplan.model.js
+// app/models/experience.model.js
 module.exports = (sequelize, Sequelize) => {
-  const Student = sequelize.define("student", {
-    StudentID: {
+  const Experience = sequelize.define("experience", {
+    experienceid: {
       type: Sequelize.INTEGER,
        primaryKey: true,
       autoIncrement: true,
     },
 
-    name: {
+    category: {
             type: Sequelize.STRING,
             allowNull: false, 
         },
 
-    email: {
+    type: {
         type: Sequelize.STRING,
          allowNull: false, 
     },
 
-    graduationdate: {
-            type: Sequelize.DATE,
+    name: {
+            type: Sequelize.STRING,
             allowNull: false, 
     },
     
             
-    major: {
-            type: Sequelize.STRING,
+    description: {
+            type: Sequelize.TEXT,
             allowNull: false, 
       },
     
-    cliftonstrengths: {
-            type: Sequelize.STRING,
-            allowNull: false, 
-      },
     
-    pointsawarded: {
+    pointsearned: {
             type: Sequelize.INTEGER,
             allowNull: false, 
       },
     
-    pointsused: {
-            type: Sequelize.INTEGER,
+    reflectionrequired: {
+            type: Sequelize.TINYINT,
             allowNull: false, 
       },
     
-     pointavailable: {
-            type: Sequelize.INTEGER,
-            allowNull: false, 
-        },
-    
-      badgesreceived: {
+     schedulingtype: {
             type: Sequelize.STRING,
             allowNull: false, 
         },
-
+    
    
   });
 
-  return Student;
+    return Experience;
 };

@@ -12,8 +12,8 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false, 
         },
 
-    Semester: {
-      type: Sequelize.STRING,
+    Semester: {   
+      type: Sequelize.STRING,  
     },
 
     SemestersFromGraduation: {
@@ -23,7 +23,7 @@ module.exports = (sequelize, Sequelize) => {
     
     
     Status: {
-            type: Sequelize.ENUM,
+            type: Sequelize.STRING,
             allowNull: false, 
         },
    
