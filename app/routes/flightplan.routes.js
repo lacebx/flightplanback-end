@@ -1,28 +1,40 @@
+const express = require("express");
+const passport = require("passport");
+
 module.exports = (app) => {
-  const tutorials = require("../controllers/flightplan.controller.js");
-  
-  var router = require("express").Router();
+  const router = express.Router();
 
-  // Create a new Tutorial
-  router.post("/", tutorials.create);
+  // Google OAuth Login Route
+  router.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+  );
 
-  // Retrieve all Tutorials
-  router.get("/", tutorials.findAll);
+  // Google OAuth Callback Route
+  router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/" }),
+    (req, res) => {
+      res.redirect("http://localhost:8080/home"); // Redirect to Vue frontend
+    }
+  );
 
-  // Retrieve all published Tutorials 
-  router.get("/published", tutorials.findAllPublished);
+  // Get Logged-in User Info
+  router.get("/auth/user", (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json(req.user);
+    } else {
+      res.status(401).json({ message: "Not authenticated" });
+    }
+  });
 
-  // Retrieve a single Tutorial with id
-  router.get("/:id", tutorials.findOne);
+  // Logout Route
+  router.get("/auth/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) return res.status(500).json({ message: "Logout failed" });
+      res.redirect("http://localhost:8080/login"); // Redirect to Vue frontend
+    });
+  });
 
-  // Update a Tutorial with id
-  router.put("/:id", tutorials.update);
-
-  // Delete a Tutorial with id
-  router.delete("/:id", tutorials.delete);
-
-  // Create a new Tutorials
-  router.delete("/", tutorials.deleteAll);
-
-  app.use("/api/tutorials", router);
+  app.use(router);
 };

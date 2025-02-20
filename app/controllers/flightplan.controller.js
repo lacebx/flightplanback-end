@@ -1,10 +1,10 @@
 const db = require("../models");
-const Tutorial = db.tutorial;
+const Flightplan = db.flightplan;
 const Op = db.Sequelize.Op
 
-// Create and Save a new Tutorial
+// Create and Save a new flightplan
 exports.create = (req, res) => {
-  // Validate request
+  // Validate request 
   if (!req.body.title) {
     res.status(400).send({
       message: "Content can not be empty!",
@@ -12,137 +12,137 @@ exports.create = (req, res) => {
     return;
   }
 
-  // Create a Tutorial              
-  const tutorial = {
+  // Create a Flightplan             
+  const flightplan = {
     title: req.body.title,
     description: req.body.description,
     published: req.body.published ? req.body.published : false,
   };
 
-  // Save Tutorial in the database    
-  Tutorial.create(tutorial)
+  // Save Flightplan in the database    
+  Flightplan.create(flightplan)
     .then((data) => {
       res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Some error occurred while creating the Tutorial.",
+        message: err.message || "Some error occurred while creating the Flightplan.",
       });
     });
 };
 
-// Retrieve all Tutorials from the database.
+// Retrieve all Flightplans from the database.
 exports.findAll = (req, res) => {
   const title = req.query.title;
   const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
 
-  Tutorial.findAll({ where: condition })
+  Flightplan.findAll({ where: condition })
     .then((data) => {
       res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Some error occurred while retrieving tutorials.",
+        message: err.message || "Some error occurred while retrieving flightplans.",
       });
     });
 };
 
-// Find a single Tutorial with an id
+// Find a single Flightplans with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Tutorial.findByPk(id)
+  Flightplan.findByPk(id)
     .then((data) => {
       if (data) {
         res.send(data);
       } else {
         res.status(404).send({
-          message: `Cannot find Tutorial with id=${id}.`,
+          message: `Cannot find Flightplan with id=${id}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Error retrieving Tutorial with id=" + id,
+        message: "Error retrieving Flightplan with id=" + id,
       });
     });
 };
 
-// Update a Tutorial by the id in the request
+// Update a Flightplan by the id in the request
 exports.update = (req, res) => {
   const id = req.params.id;
 
-  Tutorial.update(req.body, {
+  Flightplan.update(req.body, {
     where: { id: id },
   })
     .then((num) => {
       if (num == 1) {
         res.send({
-          message: "Tutorial was updated successfully.",
+          message: "Flightplan was updated successfully.",
         });
       } else {
         res.send({
-          message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found or req.body is empty!`,
+          message: `Cannot update Flightplan with id=${id}. Maybe Flightplan was not found or req.body is empty!`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Error updating Tutorial with id=" + id,
+        message: "Error updating Flightplan with id=" + id,
       });
     });
 };
 
-// Delete a Tutorial with the specified id in the request
+// Delete a Flightplan with the specified id in the request
 exports.delete = (req, res) => {
   const id = req.params.id;
 
-  Tutorial.destroy({
+  Flightplan.destroy({
     where: { id: id },
   })
     .then((num) => {
       if (num == 1) {
         res.send({
-          message: "Tutorial was deleted successfully!",
+          message: "Flightplan was deleted successfully!",
         });
       } else {
         res.send({
-          message: `Cannot delete Tutorial with id=${id}. Maybe Tutorial was not found!`,
+          message: `Cannot delete Flightplan with id=${id}. Maybe Flightplan was not found!`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Could not delete Tutorial with id=" + id,
+        message: "Could not delete Flightplan with id=" + id,
       });
     });
 };
 
-// Delete all Tutorials from the database.
+// Delete all FlightplanS from the database.
 exports.deleteAll = (req, res) => {
-  Tutorial.destroy({
+  Flightplan.destroy({
     where: {},
     truncate: false,
   })
     .then((nums) => {
-      res.send({ message: `${nums} Tutorials were deleted successfully!` });
+      res.send({ message: `${nums} FlightplanS were deleted successfully!` });
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Some error occurred while removing all tutorials.",
+        message: err.message || "Some error occurred while removing all flightplanS.",
       });
     });
 };
 
-// Find all published Tutorials
+// Find all published FlightplanS
 exports.findAllPublished = (req, res) => {
-  Tutorial.findAll({ where: { published: true } })
+  Flightplan.findAll({ where: { published: true } })
     .then((data) => {
       res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Some error occurred while retrieving published tutorials.",
+        message: err.message || "Some error occurred while retrieving published Flightplans.",
       });
     });
 };
