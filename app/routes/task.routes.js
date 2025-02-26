@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../models").default;
+const db = require("../models");
 const Task = db.task;
 
 // Create a new task

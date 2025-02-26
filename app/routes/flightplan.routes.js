@@ -1,6 +1,6 @@
 const express = require("express");
 const passport = require("passport");
-const db = require("../models").default;
+const db = require("../models");
 const Flightplan = db.flightplan;
 
 module.exports = (app) => {

@@ -121,7 +121,7 @@ app.get("/logout", (req, res) => {
 });
 
 // Include route files
-const awardRoutes = require("./app/routes/award.routes").default;
+const awardRoutes = require("./app/routes/award.routes");
 const badgeRoutes = require("./app/routes/badge.routes");
 const documentRoutes = require("./app/routes/document.routes");
 const eventRoutes = require("./app/routes/event.routes");
