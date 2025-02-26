@@ -120,13 +120,23 @@ app.get("/logout", (req, res) => {
   });
 });
 
-// FlightPlan route (example protected route for your project)
-app.get("/flightplan", (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).send("User not authenticated");
-  }
-  res.json({ message: "Welcome to the FlightPlan application." });
-});
+// Include route files
+const awardRoutes = require("./app/routes/award.routes").default;
+const badgeRoutes = require("./app/routes/badge.routes");
+const documentRoutes = require("./app/routes/document.routes");
+const eventRoutes = require("./app/routes/event.routes");
+const experienceRoutes = require("./app/routes/experience.routes");
+const flightplanRoutes = require("./app/routes/flightplan.routes");
+const taskRoutes = require("./app/routes/task.routes");
+
+// Use routes
+app.use("/awards", awardRoutes);
+app.use("/badges", badgeRoutes);
+app.use("/documents", documentRoutes);
+app.use("/events", eventRoutes);
+app.use("/experiences", experienceRoutes);
+app.use("/flightplans", flightplanRoutes);
+app.use("/tasks", taskRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {

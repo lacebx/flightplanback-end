@@ -1,4 +1,4 @@
-const db = require("../models");
+const db = require("../models").default;
 const Flightplan = db.flightplan;
 const Op = db.Sequelize.Op
 

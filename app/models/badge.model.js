@@ -1,6 +1,6 @@
 // app/models/badge.model.js
 module.exports = (sequelize, Sequelize) => {
-  const Badge = sequelize.define("badge", {
+  const Badge = sequelize.define("Badge", {
     badgeid: {
       type: Sequelize.INTEGER,
        primaryKey: true,
@@ -9,11 +9,12 @@ module.exports = (sequelize, Sequelize) => {
 
     name: {
             type: Sequelize.STRING,
+            allowNull: false,
       },
     
     
     description: {
-            type: Sequelize.TEXT,
+            type: Sequelize.STRING,
       },
     
      type: {
