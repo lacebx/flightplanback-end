@@ -1,33 +1,53 @@
 // app/models/flightplan.model.js
-module.exports = (sequelize, Sequelize) => {
-  const Flightplan = sequelize.define("flightplan", {
-    flightplanID: {
-      type: Sequelize.INTEGER,
-       primaryKey: true,
-      autoIncrement: true,
-    },
+import Sequelize from 'sequelize';
+import {db} from '../config/db.config';
+import {Task} from './task.model';
+import {Event} from './event.model';
+import {User} from './user.model.js';
 
-    studentID: {
-            type: Sequelize.INTEGER,
-            allowNull: false, 
-        },
+export const Flightplan = db.define('flightplan',{
+  flightplanID: {
+    type: Sequelize.INTEGER,
+     primaryKey: true,
+    autoIncrement: true,
+  },
 
-    Semester: {   
-      type: Sequelize.STRING,  
-    },
+  user_id: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          references: {
+              model: User,
+              key: "userID", // Matches the primary key in User
+          },
+          onDelete: "CASCADE",
+          onUpdate: "CASCADE",
+      },
 
-    SemestersFromGraduation: {
-            type: Sequelize.INTEGER,
-            allowNull: false, 
-    },
-    
-    
-    Status: {
-            type: Sequelize.STRING,
-            allowNull: false, 
-        },
-   
-  });
+  Semester: {   
+    type: Sequelize.STRING,  
+  },
 
-  return Flightplan;
-};
+  SemestersFromGraduation: {
+          type: Sequelize.INTEGER,
+          allowNull: false, 
+  },
+  
+  
+  Status: {
+          type: Sequelize.STRING,
+          allowNull: false, 
+      },
+ 
+});
+Flightplan.hasMany(Task);
+Flightplan.hasMany(Event);
+Flightplan.belongsTo(User);
+
+Flightplan.sync({ alter: true })
+    .then(() => {
+        console.log('Flightplan table synchronized');
+    })
+    .catch(err => {
+        console.error('Error syncing the Flightplan table:', err);
+    });
+

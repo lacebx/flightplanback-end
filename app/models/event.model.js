@@ -1,54 +1,75 @@
 // app/models/event.model.js
-module.exports = (sequelize, Sequelize) => {
-    const Event = sequelize.define("event", {
-        eventid: {
+import Sequelize from 'sequelize';
+import {db} from '../config/db.config.js';
+import {Flightplan} from './flightplan.model.js';
+
+export const Event = db.define('Event',{
+    eventid: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+
+    flightplan_id: {
             type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
+            allowNull: false,
+            references: {
+                model: Flightplan,
+                key: "flightplanID", // Matches the primary key in User
+            },
+            onDelete: "CASCADE",
+            onUpdate: "CASCADE",
         },
 
-        experienceid: {
-            type: Sequelize.INTEGER,
-        },
     
-    
-        name: {
-            type: Sequelize.STRING(100),
-        },
-    
-        description: {
-            type: Sequelize.TEXT,
-        },
-     
-        eventtype: {
-            type: Sequelize.STRING,
-        },
-   
-        date: {
-     
-            type: Sequelize.DATE,
-          
-        },
 
-    starttime: {
-            type: Sequelize.TIME,
-        },
 
-        endtime: {
-            type: Sequelize.TIME,
-        },
+    name: {
+        type: Sequelize.STRING(100),
+    },
+
+    description: {
+        type: Sequelize.TEXT,
+    },
+ 
+    eventtype: {
+        type: Sequelize.STRING,
+    },
+
+    date: {
+ 
+        type: Sequelize.DATE,
+      
+    },
+
+starttime: {
+        type: Sequelize.TIME,
+    },
+
+    endtime: {
+        type: Sequelize.TIME,
+    },
+
+    location: {
+        type: Sequelize.INTEGER,
+
+    },
+
+    attendancetype: {
+        type: Sequelize.STRING,
+    },
+
+
+});
+
+Event.belongsTo(Flightplan);
+
+// Sync the table (remove this before deploying in production)
+Event.sync({ alter: true })
+    .then(() => {
+        console.log('Event table synchronized');
+    })
+    .catch(err => {
+        console.error('Error syncing the Event table:', err);
+    });
     
-        location: {
-            type: Sequelize.INTEGER,
-
-        },
-    
-        attendancetype: {
-            type: Sequelize.STRING,
-        },
-
-        });
-                
-                
-    return Event;
-};

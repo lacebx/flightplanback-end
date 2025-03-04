@@ -1,7 +1,6 @@
 // app/controllers/badge.controller.js
 import { Badge } from '../models/badge.model';
 import { User } from '../models/user.model';
-import { Op } from 'sequelize';
 
 // Create and Save a new Badge associated with a User
 export const createBadge = async (req, res) => {
@@ -29,7 +28,18 @@ export const createBadge = async (req, res) => {
 // Retrieve all Badges from the database, including User details
 export const findAllBadges = async (req, res) => {
     try {
+        const { userId, minPoints } = req.query; // Example of query parameters
+
+        const condition = {};
+        if (userId) {
+            condition.user_id = userId; // Filter by user_id if provided
+        }
+        if (minPoints) {
+            condition.points = { $gte: minPoints }; // Filter by points if provided (using a different syntax)
+        }
+
         const badges = await Badge.findAll({
+            where: condition,
             include: User, // Include associated User details
         });
         res.status(200).json(badges);
