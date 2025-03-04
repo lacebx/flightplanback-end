@@ -1,28 +1,20 @@
-module.exports = (app) => {
-  const tutorials = require("../controllers/flightplan.controller.js");
-  
-  var router = require("express").Router();
+// app/routes/flightplan.routes.js
+import express from 'express';
+import {
+    createFlightplan,
+    findAllFlightplans,
+    findFlightplanById,
+    updateFlightplan,
+    deleteFlightplan,
+    deleteAllFlightplans
+} from '../controllers/flightplan.controller';
 
-  // Create a new Tutorial
-  router.post("/", tutorials.create);
+export const flightplanRouter = express.Router();
 
-  // Retrieve all Tutorials
-  router.get("/", tutorials.findAll);
+flightplanRouter.post('/', createFlightplan);               // Create a new flightplan
+flightplanRouter.get('/', findAllFlightplans);               // Retrieve all flightplans
+flightplanRouter.get('/:id', findFlightplanById);           // Retrieve a flightplan by ID
+flightplanRouter.put('/:id', updateFlightplan);             // Update a flightplan by ID
+flightplanRouter.delete('/:id', deleteFlightplan);          // Delete a flightplan by ID
+flightplanRouter.delete('/', deleteAllFlightplans);          // Delete all flightplans
 
-  // Retrieve all published Tutorials 
-  router.get("/published", tutorials.findAllPublished);
-
-  // Retrieve a single Tutorial with id
-  router.get("/:id", tutorials.findOne);
-
-  // Update a Tutorial with id
-  router.put("/:id", tutorials.update);
-
-  // Delete a Tutorial with id
-  router.delete("/:id", tutorials.delete);
-
-  // Create a new Tutorials
-  router.delete("/", tutorials.deleteAll);
-
-  app.use("/api/tutorials", router);
-};
