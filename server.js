@@ -5,6 +5,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
+const dbConfig = require("./app/config/db.config");
 
 const app = express();
 
@@ -80,7 +81,7 @@ app.get(
         }
         console.log("User authenticated successfully:", req.user);
         // Redirect to your frontend home page with user info as query parameters
-        res.redirect(`http://localhost:8080/home?firstName=${req.user.name.givenName}&lastName=${req.user.name.familyName}&email=${req.user.emails[0].value}`);
+        res.redirect(`http://localhost:8080/home`);
       });
     });
   }
@@ -130,13 +131,13 @@ const flightplanRoutes = require("./app/routes/flightplan.routes");
 const taskRoutes = require("./app/routes/task.routes");
 
 // Use routes
-app.use("/awards", awardRoutes);
-app.use("/badges", badgeRoutes);
-app.use("/documents", documentRoutes);
-app.use("/events", eventRoutes);
-app.use("/experiences", experienceRoutes);
-app.use("/flightplans", flightplanRoutes);
-app.use("/tasks", taskRoutes);
+app.use("/api/awards", awardRoutes);
+app.use("/api/badges", badgeRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/experiences", experienceRoutes);
+app.use("/api/flightplans", flightplanRoutes);
+app.use("/api/tasks", taskRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -144,6 +145,21 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
+// Log DB configurations
+console.log("DB Configurations:");
+console.log(`Database Name: ${dbConfig.DB}`);
+console.log(`Database Host: ${dbConfig.HOST}`);
+console.log(`Database Port: ${dbConfig.PORT}`);
+console.log(`Database User: ${dbConfig.USER}`);
+console.log(`Database Password: ${dbConfig.PASSWORD}`);
+
 // Start server
 const PORT = process.env.PORT || 8082;
-app.listen(PORT, () => console.log(`Server is running at port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running at port ${PORT}`);
+  console.log("Server configurations:");
+  console.log(`CORS Origin: http://localhost:8080`);
+  console.log(`Session Secret: ${process.env.SESSION_SECRET || 'secretkey'}`);
+  console.log(`Google Client ID: ${process.env.GOOGLE_CLIENT_ID}`);
+  console.log(`Google Client Secret: ${process.env.GOOGLE_CLIENT_SECRET}`);
+});
