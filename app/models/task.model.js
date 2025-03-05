@@ -20,11 +20,11 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(100),
         },
      
-        descripion: {
+        description: {
             type: Sequelize.TEXT,
         },
    
-        pointesearned: {
+        pointsearned: {
      
             type: Sequelize.INTEGER(11),
           
@@ -34,7 +34,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.TINYINT,
         },
 
-        shedulingtype: {
+        schedulingtype: {
             type: Sequelize.STRING,
         },
     
