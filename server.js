@@ -157,6 +157,10 @@ console.log(`Database Password: ${process.env.MYSQL_PASSWORD}`);
 
 // Start server
 
+
+
+//THIS WAS AN ATTEMPT TO CREATE A DATABASE IF IT DOESN'T EXIST ALREADY
+
 // const dbName = process.env.MYSQL_DATABASE; // Your database name
 // const dbUser = process.env.MYSQL_USER; // Your database user
 // const dbPassword = process.env.MYSQL_PASSWORD; // Your database password
