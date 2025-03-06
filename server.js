@@ -9,9 +9,9 @@ const dbConfig = require("./app/config/db.config");
 
 const app = express();
 
-// Configure CORS to allow your frontend (assumed at http://localhost:8080)
+// Configure CORS to allow your frontend (assumed at http://localhost:8081)
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: 'http://localhost:8081',
   credentials: true,
 }));
 
@@ -38,7 +38,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:8082/auth/google/callback', // Adjust backend port if needed
+  callbackURL: 'http://localhost:8080/auth/google/callback', // Adjust backend port if needed
 },
 (accessToken, refreshToken, profile, done) => {
   console.log("Access Token:", accessToken);
@@ -81,7 +81,7 @@ app.get(
         }
         console.log("User authenticated successfully:", req.user);
         // Redirect to your frontend home page with user info as query parameters
-        res.redirect(`http://localhost:8080/home`);
+        res.redirect(`http://localhost:8081/home`);
       });
     });
   }
@@ -154,9 +154,9 @@ console.log(`Database User: ${dbConfig.USER}`);
 console.log(`Database Password: ${dbConfig.PASSWORD}`);
 
 // Start server
-const PORT = process.env.PORT || 8082;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`Server is running at port ${PORT}`);
+  console.log(`Server is running on port ${PORT}.`);
   console.log("Server configurations:");
   console.log(`CORS Origin: http://localhost:8080`);
   console.log(`Session Secret: ${process.env.SESSION_SECRET || 'secretkey'}`);
