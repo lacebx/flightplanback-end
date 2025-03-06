@@ -7,7 +7,7 @@ import {
     updateFlightplan,
     deleteFlightplan,
     deleteAllFlightplans
-} from '../controllers/flightplan.controller';
+} from '../controllers/flightplan.controller.js';
 
 export const flightplanRouter = express.Router();
 

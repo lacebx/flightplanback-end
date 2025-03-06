@@ -1,7 +1,7 @@
 // app/models/event.model.js
 import Sequelize from 'sequelize';
 import {db} from '../config/db.config.js';
-import {Flightplan} from './flightplan.model.js';
+import {Flightplan} from './index.js';
 
 export const Event = db.define('Event',{
     eventid: {
@@ -14,7 +14,7 @@ export const Event = db.define('Event',{
             type: Sequelize.INTEGER,
             allowNull: false,
             references: {
-                model: Flightplan,
+                model: 'flightplans',
                 key: "flightplanID", // Matches the primary key in User
             },
             onDelete: "CASCADE",
@@ -61,8 +61,6 @@ starttime: {
 
 
 });
-
-Event.belongsTo(Flightplan);
 
 // Sync the table (remove this before deploying in production)
 Event.sync({ alter: true })

@@ -1,7 +1,7 @@
 // app/models/experience.model.js
 import Sequelize from 'sequelize';
 import {db} from '../config/db.config.js';
-import {User} from './user.model.js';
+
 
 export const Experience = db.define('experience',{
 
@@ -15,7 +15,7 @@ export const Experience = db.define('experience',{
           type: Sequelize.INTEGER,
           allowNull: false,
           references: {
-              model: User,
+              model: 'users',
               key: "userID", // Matches the primary key in User
           },
           onDelete: "CASCADE",
@@ -60,7 +60,6 @@ export const Experience = db.define('experience',{
       },
 
 });
-Experience.belongsTo(User);
 
 Experience.sync({ alter: true })
     .then(() => {

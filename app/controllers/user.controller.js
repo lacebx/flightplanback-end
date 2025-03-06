@@ -1,10 +1,5 @@
 // app/controllers/user.controller.js
-import { User } from '../models/user.model';
-import { Document } from '../models/document.model';
-import { Badge } from '../models/badge.model';
-import { Experience } from '../models/experience.model';
-import { Award } from '../models/award.model';
-import { Flightplan } from '../models/flightplan.model';
+import { User, Document, Badge, Experience, Award, Flightplan } from '../models/index.js';
 
 // Create and Save a new User
 export const createUser = async (req, res) => {

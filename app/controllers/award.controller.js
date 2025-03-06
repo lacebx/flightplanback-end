@@ -1,6 +1,6 @@
 // app/controllers/award.controller.js
-import { Award } from '../models/award.model';
-import { User } from '../models/user.model';
+import { Award,User } from '../models/index.js';
+
 
 
 // Create and Save a new Award associated with a User

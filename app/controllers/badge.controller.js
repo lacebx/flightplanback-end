@@ -1,6 +1,6 @@
 // app/controllers/badge.controller.js
-import { Badge } from '../models/badge.model';
-import { User } from '../models/user.model';
+import { Badge, User } from '../models/index.js';
+
 
 // Create and Save a new Badge associated with a User
 export const createBadge = async (req, res) => {

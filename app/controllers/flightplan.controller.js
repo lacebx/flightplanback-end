@@ -1,8 +1,5 @@
 // app/controllers/flightplan.controller.js
-import { Flightplan } from '../models/flightplan.model';
-import { Task } from '../models/task.model';
-import { Event } from '../models/event.model';
-import { User } from '../models/user.model'; // Import User model
+import { Flightplan, Task, Event, User } from '../models/index.js';
 
 // Create and Save a new Flightplan associated with a User
 export const createFlightplan = async (req, res) => {

@@ -1,57 +1,44 @@
 // app/models/award.model.js
 import Sequelize from 'sequelize';
-import {db} from '../config/db.config';
-import {User} from './user.model';
+import { db } from '../config/db.config.js';
 
-export const Award = db.define('award',{
+export const Award = db.define('award', {
     awardid: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },
-
     user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-            model: User,
-            key: "userID", // Matches the primary key in User
+            model: 'users',  // Use the model name as a string
+            key: 'userID',
         },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
     },
-
     name: {
         type: Sequelize.STRING(100),
     },
-
-
     description: {
         type: Sequelize.TEXT,
     },
-
     points: {
         type: Sequelize.INTEGER,
     },
- 
     redemptiontype: {
         type: Sequelize.STRING,
     },
-
     redemptioninfo: {
- 
         type: Sequelize.TEXT,
-      
     },
-
-
-
-
 });
-Award.belongsTo(User);
+
+// Define associations in the index file
 
 
-//remove before moving to server
+//remove before deployment
 
 Award.sync({ alter: true })
     .then(() => {

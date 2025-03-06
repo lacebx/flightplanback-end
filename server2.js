@@ -1,13 +1,12 @@
-import express from 'express';
-import session from 'express-session';
-import passport from 'passport';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import {db} from './app/config/db.config.js';
 
-dotenv.config();
+const express = require("express");
+const session = require("express-session");
+const passport = require("passport");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+require("dotenv").config();
+const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
+const dbConfig = require("./app/config/db.config");
 
 const app = express();
 
@@ -70,6 +69,7 @@ app.get(
   "/auth/google/callback",
   passport.authenticate('google', { failureRedirect: "/" }),
   (req, res) => {
+    // Ensure the user is logged in and the session is saved before redirecting
     req.login(req.user, function (err) {
       if (err) {
         console.error("Login error:", err);
@@ -81,6 +81,7 @@ app.get(
           return res.redirect("/");
         }
         console.log("User authenticated successfully:", req.user);
+        // Redirect to your frontend home page with user info as query parameters
         res.redirect(`http://localhost:8080/home`);
       });
     });
@@ -122,24 +123,22 @@ app.get("/logout", (req, res) => {
 });
 
 // Include route files
-import {awardRouter} from './app/routes/award.routes.js';
-import {badgeRouter} from './app/routes/badge.routes.js';
-import {documentRouter} from './app/routes/document.routes.js';
-import {eventRouter} from './app/routes/event.routes.js';
-import {experienceRouter} from './app/routes/experience.routes.js';
-import {flightplanRouter} from './app/routes/flightplan.routes.js';
-import {taskRouter} from './app/routes/task.routes.js';
-import {userRouter} from './app/routes/user.routes.js';
+const awardRoutes = require("./app/routes/award.routes");
+const badgeRoutes = require("./app/routes/badge.routes");
+const documentRoutes = require("./app/routes/document.routes");
+const eventRoutes = require("./app/routes/event.routes");
+const experienceRoutes = require("./app/routes/experience.routes");
+const flightplanRoutes = require("./app/routes/flightplan.routes");
+const taskRoutes = require("./app/routes/task.routes");
 
 // Use routes
-app.use("/api/awards", awardRouter);
-app.use("/api/badges", badgeRouter);
-app.use("/api/documents", documentRouter);
-app.use("/api/events", eventRouter);
-app.use("/api/experiences", experienceRouter);
-app.use("/api/flightplans", flightplanRouter);
-app.use("/api/tasks", taskRouter);
-app.use("/api/users", userRouter)
+app.use("/api/awards", awardRoutes);
+app.use("/api/badges", badgeRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/experiences", experienceRoutes);
+app.use("/api/flightplans", flightplanRoutes);
+app.use("/api/tasks", taskRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -149,60 +148,13 @@ app.use((err, req, res, next) => {
 
 // Log DB configurations
 console.log("DB Configurations:");
-console.log(`Database Name: ${process.env.MYSQL_NAME}`);
-console.log(`Database Host: ${process.env.MYSQL_HOST}`);
-console.log(`Database Port: ${process.env.MYSQL_PORT}`);
-console.log(`Database User: ${process.env.MYSQL_USER}`);
-console.log(`Database Password: ${process.env.MYSQL_PASSWORD}`);
+console.log(`Database Name: ${dbConfig.DB}`);
+console.log(`Database Host: ${dbConfig.HOST}`);
+console.log(`Database Port: ${dbConfig.PORT}`);
+console.log(`Database User: ${dbConfig.USER}`);
+console.log(`Database Password: ${dbConfig.PASSWORD}`);
 
 // Start server
-
-// const dbName = process.env.MYSQL_DATABASE; // Your database name
-// const dbUser = process.env.MYSQL_USER; // Your database user
-// const dbPassword = process.env.MYSQL_PASSWORD; // Your database password
-// const dbHost = process.env.MYSQL_HOST; // Your database host
-// const dbDialect = process.env.MYSQL_DIALECT;
-
-// const sequelize = new Sequelize(`postgres://${dbUser}:${dbPassword}@${dbHost}`, {
-//   dialect: dbDialect, // Change to your DB dialect
-// });
-
-// // Function to create the database
-// const createDatabaseIfNotExists = async () => {
-//   try {
-//     await sequelize.query(`CREATE DATABASE "${dbName}"`);
-//     console.log(`Database "${dbName}" created successfully.`);
-//   } catch (error) {
-//     if (error.name === 'SequelizeDatabaseError' && error.original.code === '42P04') {
-//       // Database already exists
-//       console.log(`Database "${dbName}" already exists.`);
-//     } else {
-//       console.error('Error creating database:', error);
-//     }
-//   }
-// };
-
-// // Call the function to create the database
-// createDatabaseIfNotExists()
-//   .then(() => {
-//     // Now initialize Sequelize with the database
-//     const sequelizeWithDb = new Sequelize(dbName, dbUser, dbPassword, {
-//       host: dbHost,
-//       dialect: dbDialect, // Change to your DB dialect
-//     });
-
-//     // Sync models with the database
-//     return sequelizeWithDb.sync({ force: false }); // Use 'alter: true' if needed
-//   })
-//   .then(() => {
-//     console.log('Database and tables synchronized successfully.');
-//   })
-//   .catch((error) => {
-//     console.error('Error initializing Sequelize:', error);
-//   });
-
-
-
 const PORT = process.env.PORT || 8082;
 app.listen(PORT, () => {
   console.log(`Server is running at port ${PORT}`);
@@ -212,3 +164,4 @@ app.listen(PORT, () => {
   console.log(`Google Client ID: ${process.env.GOOGLE_CLIENT_ID}`);
   console.log(`Google Client Secret: ${process.env.GOOGLE_CLIENT_SECRET}`);
 });
+	
