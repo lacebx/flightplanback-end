@@ -54,6 +54,31 @@ router.put("/:id", async (req, res) => {
     }
 });
 
+
+// Complete a task by ID
+router.put("/:id/complete", async (req, res) => {
+    try {
+        const task = await Task.findByPk(req.params.id);
+        if (task) {
+            // Mark the task as complete
+            await Task.update({ completiontype: 'complete' }, {
+                where: { Taskid: req.params.id }
+            });
+            // Optionally, delete the task if you want to remove it from the database
+            await Task.destroy({
+                where: { Taskid: req.params.id }
+            });
+            res.status(200).json({ message: "Task completed and removed" });
+        } else {
+            res.status(404).json({ message: "Task not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
+
 // Delete a task by ID
 router.delete("/:id", async (req, res) => {
     try {
