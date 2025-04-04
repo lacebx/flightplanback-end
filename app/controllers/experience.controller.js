@@ -11,11 +11,11 @@ exports.create = async (req, res) => {
     }
 };
 
-// Get all experiences
+// Get all experience
 exports.findAll = async (req, res) => {
     try {
-        const experiences = await Experience.findAll();
-        res.status(200).json(experiences);
+        const experience = await Experience.findAll();
+        res.status(200).json(experience);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

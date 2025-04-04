@@ -135,7 +135,7 @@ app.use("/api/awards", awardRoutes);
 app.use("/api/badges", badgeRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/events", eventRoutes);
-app.use("/api/experiences", experienceRoutes);
+app.use("/api/experience", experienceRoutes);
 app.use("/api/flightplans", flightplanRoutes);
 app.use("/api/tasks", taskRoutes);
 

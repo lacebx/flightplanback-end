@@ -1,9 +1,10 @@
 module.exports = {
-  HOST: "127.0.0.1",
-  USER: "root",
-  PASSWORD: "password",
-  DB: "eagleflightplan",
+  HOST: "project2.eaglesoftwareteam.com", 
+  USER: "t82024",
+  PASSWORD: "CS@oc2024t8",
+  DB: "flight-plan-t8",
   dialect: "mysql",
+  port: 3306,
   pool: {
     max: 5,
     min: 0,
