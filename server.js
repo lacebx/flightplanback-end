@@ -129,6 +129,11 @@ const eventRoutes = require("./app/routes/event.routes");
 const experienceRoutes = require("./app/routes/experience.routes");
 const flightplanRoutes = require("./app/routes/flightplan.routes");
 const taskRoutes = require("./app/routes/task.routes");
+const registrationRoutes = require("./app/routes/registration.routes");
+const userRoutes = require("./app/routes/user.routes");
+const taskCompletionRoutes = require("./app/routes/taskCompletion.routes");
+const eventAttendanceRoutes = require("./app/routes/eventAttendance.routes");
+const strengthRoutes = require("./app/routes/strength.routes");
 
 // Use routes
 app.use("/api/awards", awardRoutes);
@@ -138,6 +143,11 @@ app.use("/api/events", eventRoutes);
 app.use("/api/experiences", experienceRoutes);
 app.use("/api/flightplans", flightplanRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/events", registrationRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/task-completions", taskCompletionRoutes);
+app.use("/api/event-attendances", eventAttendanceRoutes);
+app.use("/api/strengths", strengthRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {

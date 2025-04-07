@@ -34,14 +34,14 @@ passport.use(
 
 // Serialize user into the session
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, { id: user.id, role: user.role });
 });
 
 // Deserialize user from the session
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (user, done) => {
   try {
-    const user = await User.findByPk(id);
-    done(null, user);
+    const dbUser = await User.findByPk(user.id);
+    done(null, dbUser);
   } catch (err) {
     done(err, null);
   }

@@ -39,8 +39,7 @@ module.exports = (sequelize, Sequelize) => {
         },
     
         location: {
-            type: Sequelize.INTEGER,
-
+            type: Sequelize.STRING,
         },
     
         attendancetype: {
