@@ -1,7 +1,7 @@
 // app/models/document.model.js
 import Sequelize from 'sequelize';
 import {db} from '../config/db.config.js';
-import {User} from './user.model.js';
+
 
 export const Document = db.define('document',{
          documentid: {
@@ -14,7 +14,7 @@ export const Document = db.define('document',{
                         type: Sequelize.INTEGER,
                         allowNull: false,
                         references: {
-                            model: User,
+                            model: 'users',
                             key: "userID", // Matches the primary key in User
                         },
                         onDelete: "CASCADE",
@@ -32,7 +32,7 @@ export const Document = db.define('document',{
              
 
 });
-Document.belongsTo(User);
+
 
 Document.sync({ alter: true })
     .then(() => {

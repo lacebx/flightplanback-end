@@ -1,6 +1,5 @@
 // app/controllers/experience.controller.js
-import { Experience } from '../models/experience.model';
-import { User } from '../models/user.model';
+import { Experience, User } from '../models/index.js';
 
 // Create and Save a new Experience associated with a User
 export const createExperience = async (req, res) => {

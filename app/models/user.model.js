@@ -1,10 +1,5 @@
 import Sequelize from 'sequelize';
 import {db} from '../config/db.config.js';
-import {Award} from './award.model.js';
-import {Experience} from './experience.model.js';
-import {Document} from './document.model.js';
-import {Badge} from './badge.model.js';
-import {Flightplan} from './flightplan.model.js';
 
 export const User = db.define('user',{
     userID: {
@@ -98,18 +93,13 @@ export const User = db.define('user',{
               }, 
           },
           role:{
-            type:DataTypes.ENUM('admin','student'),
+            type:Sequelize.ENUM('admin','student'),
             allowNull: false,
             defaultValue: 'student',
           }
   
 
 });
-User.hasMany(Document);
-User.hasMany(Badge);
-User.hasMany(Experience);
-User.hasMany(Award);
-User.hasOne(Flightplan);
 
 User.sync({ alter: true })
     .then(() => {

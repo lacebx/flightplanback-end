@@ -7,7 +7,7 @@ import {
     updateBadge,
     deleteBadge,
     deleteAllBadges
-} from '../controllers/badge.controller';
+} from '../controllers/badge.controller.js';
 
 export const badgeRouter = express.Router();
 

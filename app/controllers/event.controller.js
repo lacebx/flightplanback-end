@@ -1,6 +1,5 @@
 // app/controllers/event.controller.js
-import { Event } from '../models/event.model';
-import { Flightplan } from '../models/flightplan.model';
+import { Event, Flightplan } from '../models/index.js';
 
 // Create and Save a new Event associated with a Flightplan
 export const createEvent = async (req, res) => {

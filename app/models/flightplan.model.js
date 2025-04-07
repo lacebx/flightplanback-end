@@ -1,9 +1,7 @@
 // app/models/flightplan.model.js
 import Sequelize from 'sequelize';
-import {db} from '../config/db.config';
-import {Task} from './task.model';
-import {Event} from './event.model';
-import {User} from './user.model.js';
+import {db} from '../config/db.config.js';
+import {User} from './index.js';
 
 export const Flightplan = db.define('flightplan',{
   flightplanID: {
@@ -16,7 +14,7 @@ export const Flightplan = db.define('flightplan',{
           type: Sequelize.INTEGER,
           allowNull: false,
           references: {
-              model: User,
+              model: 'users',
               key: "userID", // Matches the primary key in User
           },
           onDelete: "CASCADE",
@@ -39,9 +37,6 @@ export const Flightplan = db.define('flightplan',{
       },
  
 });
-Flightplan.hasMany(Task);
-Flightplan.hasMany(Event);
-Flightplan.belongsTo(User);
 
 Flightplan.sync({ alter: true })
     .then(() => {

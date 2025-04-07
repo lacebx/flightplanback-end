@@ -1,7 +1,7 @@
 // app/models/task.model.js
 import Sequelize from 'sequelize';
 import { db } from '../config/db.config.js';
-import {Flightplan} from './flightplan.model.js';
+import {Flightplan} from './index.js';
 
 export const Task  = db.define('task',{
     Taskid: {
@@ -14,7 +14,7 @@ export const Task  = db.define('task',{
             type: Sequelize.INTEGER,
             allowNull: false,
             references: {
-                model: Flightplan,
+                model: 'flightplans',
                 key: "flightplanID", // Matches the primary key in User
             },
             onDelete: "CASCADE",
@@ -61,8 +61,6 @@ export const Task  = db.define('task',{
 {
     timestamp: false,
 });
-
-Task.belongsTo(Flightplan);
 
 // Sync the table (remove this before deploying in production)
 Task.sync({ alter: true })

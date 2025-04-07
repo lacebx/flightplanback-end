@@ -7,7 +7,7 @@ import {
     updateDocument,
     deleteDocument,
     deleteAllDocuments
-} from '../controllers/document.controller';
+} from '../controllers/document.controller.js';
 
 export const documentRouter = express.Router();
 

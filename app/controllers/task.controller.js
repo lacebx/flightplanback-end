@@ -1,6 +1,5 @@
 // app/controllers/task.controller.js
-import { Task } from '../models/task.model';
-import { Flightplan } from '../models/flightplan.model';
+import { Task, Flightplan } from '../models/index.js';
 
 // Create and Save a new Task associated with a Flightplan
 export const createTask = async (req, res) => {

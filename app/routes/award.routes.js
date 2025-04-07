@@ -7,7 +7,7 @@ import {
     updateAward,
     deleteAward,
     deleteAllAwards
-} from '../controllers/award.controller';
+} from '../controllers/award.controller.js';
 
 export const awardRouter = express.Router();
 

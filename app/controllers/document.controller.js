@@ -1,6 +1,5 @@
 // app/controllers/document.controller.js
-import { Document } from '../models/document.model';
-import { User } from '../models/user.model';
+import { Document, User } from '../models/index.js';
 
 // Create and Save a new Document associated with a User
 export const createDocument = async (req, res) => {
