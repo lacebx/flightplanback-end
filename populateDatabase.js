@@ -6,6 +6,17 @@ async function populateDatabase() {
     // Synchronize all models with the database
     await db.sequelize.sync({ force: true });
 
+    // Add specific user with admin role
+    await db.user.create({
+      firstName: 'A',
+      lastName: 'Manzi',
+      major: 'Administration',
+      idNumber: '1500001',
+      role: 'admin',
+      semester: 1,
+      email: 'a.manzi@eagles.oc.edu',
+    });
+
     // Populate Users
     for (let i = 0; i < 30; i++) {
       const user = await db.user.create({
@@ -14,6 +25,8 @@ async function populateDatabase() {
         major: faker.commerce.department(),
         idNumber: `15${faker.number.int({ min: 10000, max: 99999 })}`,
         role: faker.helpers.arrayElement(["student", "admin", "student staff"]),
+        semester: faker.number.int({ min: 1, max: 8 }),
+        email: `${faker.internet.userName().toLowerCase()}@eagles.oc.edu`,
       });
 
       // Populate related data for each user
@@ -48,6 +61,7 @@ async function populateDatabase() {
         type: faker.helpers.arrayElement(["assignment", "project", "quiz"]),
         points: faker.number.int({ min: 1, max: 100 }),
         schedulingtype: faker.helpers.arrayElement(["weekly", "monthly", "one-time"]),
+        semester: faker.number.int({ min: 1, max: 8 }),
       });
     }
 

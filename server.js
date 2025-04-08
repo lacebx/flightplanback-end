@@ -6,6 +6,8 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
 const dbConfig = require("./app/config/db.config");
+const { faker } = require('@faker-js/faker');
+const db = require("./app/models");
 
 const app = express();
 
@@ -47,8 +49,38 @@ passport.use(new GoogleStrategy({
   if (!profile) {
     return done(new Error("Authentication failed: No profile received."), null);
   }
-  // In a production app, you would look up or create the user in your database here.
-  return done(null, profile);
+
+  // Check if the user email ends with @eagles.oc.edu
+  if (!profile.emails[0].value.endsWith('@eagles.oc.edu')) {
+    return done(new Error("Unauthorized email domain."), null);
+  }
+
+  // Generate a valid idNumber
+  const generateIdNumber = () => `15${faker.number.int({ min: 10000, max: 99999 })}`;
+
+  // Check if the user exists in the database
+  db.user.findOrCreate({
+    where: { email: profile.emails[0].value }, // Use email to check existence
+    defaults: {
+      firstName: profile.name.givenName,
+      lastName: profile.name.familyName,
+      email: profile.emails[0].value,
+      role: 'student',
+      major: faker.commerce.department(), // Random major
+      semester: faker.number.int({ min: 1, max: 8 }), // Random semester
+      idNumber: generateIdNumber() // Generate valid idNumber
+    }
+  }).then(([user, created]) => {
+    if (created) {
+      console.log('New user created:', user);
+    } else {
+      console.log('User already exists:', user);
+    }
+    return done(null, user);
+  }).catch(err => {
+    console.error('Error finding or creating user:', err);
+    return done(err, null);
+  });
 }));
 
 passport.serializeUser((user, done) => done(null, user));
@@ -80,8 +112,15 @@ app.get(
           return res.redirect("/");
         }
         console.log("User authenticated successfully:", req.user);
-        // Redirect to your frontend home page with user info as query parameters
-        res.redirect(`http://localhost:8080/home`);
+        console.log("User role:", req.user.role);
+        // Redirect based on user role
+        if (req.user.role === "admin" || req.user.role === "student staff") {
+          res.redirect(`http://localhost:8080/admin`);
+        } else if (req.user.role === "student") {
+          res.redirect(`http://localhost:8080/home`);
+        } else {
+          res.redirect("/"); // Default redirect if role is not recognized
+        }
       });
     });
   }

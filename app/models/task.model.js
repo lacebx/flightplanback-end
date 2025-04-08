@@ -43,7 +43,15 @@ module.exports = (sequelize, Sequelize) => {
 
         },
     
-        });
+        semester: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 1,
+                max: 8,
+            },
+        },
+    });
                 
                 
     return Task;

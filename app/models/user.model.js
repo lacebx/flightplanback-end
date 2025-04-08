@@ -25,6 +25,22 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       defaultValue: "student", // Default role
     },
+    semester: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 1,
+        max: 8,
+      },
+    },
+    email: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
+      },
+    },
   });
 
   return User;
