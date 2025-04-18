@@ -70,4 +70,20 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
+// Register for an event
+router.post('/:id/register', async (req, res) => {
+    try {
+        const { name, email, isVisible } = req.body;
+        const eventId = req.params.id;
+
+        
+        
+       
+
+    } catch (error) {
+        console.error('Error registering for event:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 module.exports = router; 

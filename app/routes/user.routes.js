@@ -11,4 +11,7 @@ router.put("/:id/role", userController.updateRole);
 // Create or update a user
 router.post("/", userController.createOrUpdate);
 
+// Get user profile by email
+router.get("/profile/:email", userController.findProfileByEmail);
+
 module.exports = router; 

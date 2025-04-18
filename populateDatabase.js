@@ -15,6 +15,7 @@ async function populateDatabase() {
       role: 'admin',
       semester: 1,
       email: 'a.manzi@eagles.oc.edu',
+      points: 0,
     });
 
     // Populate Users
@@ -27,6 +28,7 @@ async function populateDatabase() {
         role: faker.helpers.arrayElement(["student", "admin", "student staff"]),
         semester: faker.number.int({ min: 1, max: 8 }),
         email: `${faker.internet.userName().toLowerCase()}@eagles.oc.edu`,
+        points: 0,
       });
 
       // Populate related data for each user
@@ -59,9 +61,10 @@ async function populateDatabase() {
         description: faker.lorem.sentence(),
         category: faker.commerce.department(),
         type: faker.helpers.arrayElement(["assignment", "project", "quiz"]),
-        points: faker.number.int({ min: 1, max: 100 }),
+        earnablepoints: faker.helpers.arrayElement([10, 20, 30, 40, 50]),
         schedulingtype: faker.helpers.arrayElement(["weekly", "monthly", "one-time"]),
         semester: faker.number.int({ min: 1, max: 8 }),
+        completed: faker.datatype.boolean()
       });
     }
 
@@ -70,7 +73,7 @@ async function populateDatabase() {
       await db.event.create({
         name: faker.lorem.words(3),
         description: faker.lorem.sentence(),
-        eventtype: faker.helpers.arrayElement(["workshop", "seminar", "conference"]),
+        eventtype: faker.helpers.arrayElement(["active", "inactive"]),
         date: faker.date.future(),
         starttime: faker.date.recent(),
         endtime: faker.date.recent(),

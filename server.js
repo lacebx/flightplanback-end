@@ -8,6 +8,10 @@ const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
 const dbConfig = require("./app/config/db.config");
 const { faker } = require('@faker-js/faker');
 const db = require("./app/models");
+const adminRoutes = require("./app/routes/admin.routes");
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const { google } = require('googleapis');
 
 const app = express();
 
@@ -187,6 +191,211 @@ app.use("/api/users", userRoutes);
 app.use("/api/task-completions", taskCompletionRoutes);
 app.use("/api/event-attendances", eventAttendanceRoutes);
 app.use("/api/strengths", strengthRoutes);
+app.use("/api/admin", adminRoutes);
+
+// Endpoint to register for an event
+app.post('/api/events/:eventId/register', (req, res) => {
+  const { eventId } = req.params;
+  const { email, isVisible } = req.body;
+
+  db.user.findOne({ where: { email } })
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      return db.eventAttendance.create({
+        userId: user.id,
+        eventId,
+        attended: false, // Initially not attended
+        isVisible
+      });
+    })
+    .then(() => res.status(200).json({ message: 'Registered successfully' }))
+    .catch(err => {
+      console.error('Error registering for event:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+// Endpoint to fetch registered events
+app.get('/api/users/:userId/registered-events', (req, res) => {
+  const { userId } = req.params;
+
+  db.eventAttendance.findAll({ where: { userId }, include: [db.event] })
+    .then(events => res.json(events))
+    .catch(err => {
+      console.error('Error fetching registered events:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+// Logic to update points when an event is attended
+app.put('/api/events/:eventId/attend', (req, res) => {
+  const { eventId } = req.params;
+  const { userId } = req.body;
+
+  db.eventAttendance.findOne({ where: { userId, eventId } })
+    .then(attendance => {
+      if (!attendance) {
+        return res.status(404).json({ message: 'Attendance record not found' });
+      }
+
+      attendance.attended = true;
+      return attendance.save();
+    })
+    .then(() => db.user.findByPk(userId))
+    .then(user => {
+      user.points += 10; // Award points for attending
+      return user.save();
+    })
+    .then(() => res.status(200).json({ message: 'Attendance recorded and points awarded' }))
+    .catch(err => {
+      console.error('Error updating attendance:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+// Logic to update tasks completed count
+app.put('/api/tasks/:taskId/complete', (req, res) => {
+  const { taskId } = req.params;
+  const { userId } = req.body;
+
+  db.taskCompletion.findOne({ where: { userId, taskId } })
+    .then(taskCompletion => {
+      if (!taskCompletion) {
+        return res.status(404).json({ message: 'Task completion record not found' });
+      }
+
+      taskCompletion.completed = true;
+      return taskCompletion.save();
+    })
+    .then(() => db.user.findByPk(userId))
+    .then(user => {
+      user.points += 5; // Award points for completing a task
+      return user.save();
+    })
+    .then(() => res.status(200).json({ message: 'Task marked as completed and points awarded' }))
+    .catch(err => {
+      console.error('Error updating task completion:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+// Endpoint to fetch admin dashboard stats
+app.get('/api/admin/stats', async (req, res) => {
+  try {
+    const totalStudents = await db.user.count();
+    const activeEvents = await db.event.count({ where: { eventtype: 'active' } }); // Assuming 'active' is a valid event type
+    const pendingTasks = await db.task.count({ where: { completed: false } }); // Assuming 'completed' is a field in tasks
+
+    res.json({
+      totalStudents,
+      activeEvents,
+      pendingTasks
+    });
+  } catch (error) {
+    console.error('Error fetching admin stats:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Configure nodemailer
+const OAuth2 = google.auth.OAuth2;
+
+const oauth2Client = new OAuth2(
+  process.env.GOOGLE_CLIENT_ID, // Use your existing Google Client ID
+  process.env.GOOGLE_CLIENT_SECRET, // Use your existing Google Client Secret
+  "https://developers.google.com/oauthplayground" // Redirect URL
+);
+
+// Set the credentials using the refresh token you have
+oauth2Client.setCredentials({
+  refresh_token: process.env.REFRESH_TOKEN // Ensure you have this in your .env
+});
+
+// Get the access token
+const accessToken = oauth2Client.getAccessToken();
+
+// Configure nodemailer with OAuth2
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    type: 'OAuth2',
+    user: process.env.EMAIL_USER, // Your email address
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    refreshToken: process.env.REFRESH_TOKEN,
+    accessToken: accessToken
+  }
+});
+
+// Endpoint to send magic link
+app.post('/auth/magic-link', (req, res) => {
+  const { email } = req.body;
+
+  db.user.findOne({ where: { email } })
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Generate a unique token
+      const token = crypto.randomBytes(20).toString('hex');
+
+      // Save the token in the database with an expiration time
+      user.magicToken = token;
+      user.magicTokenExpires = Date.now() + 3600000; // 1 hour
+      return user.save();
+    })
+    .then(user => {
+      // Send the magic link email
+      const mailOptions = {
+        to: user.email,
+        from: process.env.EMAIL_USER,
+        subject: 'Your Magic Link',
+        text: `Click the following link to log in: http://localhost:8082/auth/magic-link/${user.magicToken}`,
+      };
+
+      return transporter.sendMail(mailOptions);
+    })
+    .then(() => {
+      res.status(200).json({ message: 'Magic link sent' });
+    })
+    .catch(err => {
+      console.error('Error sending magic link:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+// Endpoint to verify magic link
+app.get('/auth/magic-link/:token', (req, res) => {
+  const { token } = req.params;
+
+  db.user.findOne({ where: { magicToken: token, magicTokenExpires: { [Op.gt]: Date.now() } } })
+    .then(user => {
+      if (!user) {
+        return res.status(400).json({ message: 'Magic link is invalid or has expired' });
+      }
+
+      // Log the user in
+      req.login(user, function (err) {
+        if (err) {
+          return res.status(500).json({ message: 'Login error' });
+        }
+        req.session.save((err) => {
+          if (err) {
+            return res.status(500).json({ message: 'Session save error' });
+          }
+          res.redirect('http://localhost:8080/home');
+        });
+      });
+    })
+    .catch(err => {
+      console.error('Error verifying magic link:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
 
 // Global error handler
 app.use((err, req, res, next) => {

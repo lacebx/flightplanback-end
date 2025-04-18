@@ -24,7 +24,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.TEXT,
         },
    
-        pointsearned: {
+        earnablepoints: {
      
             type: Sequelize.INTEGER(11),
           

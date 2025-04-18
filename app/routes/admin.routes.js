@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../models");
 const User = db.user;
+const adminController = require('../controllers/admin.controller');
 
 // Middleware to check admin role
 const isAdmin = (req, res, next) => {
@@ -35,5 +36,8 @@ router.put("/users/:id/points", isAdmin, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+// Route to get admin statistics
+router.get('/stats', adminController.getStats);
 
 module.exports = router; 
