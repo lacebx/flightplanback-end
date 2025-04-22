@@ -1,5 +1,6 @@
 const { faker } = require('@faker-js/faker');
 const db = require("./app/models");
+const bcrypt = require('bcrypt');
 
 async function populateDatabase() {
   try {
@@ -16,6 +17,7 @@ async function populateDatabase() {
       semester: 1,
       email: 'a.manzi@eagles.oc.edu',
       points: 0,
+      password: await bcrypt.hash('adminpassword', 10),
     });
 
     // Populate Users
@@ -29,6 +31,7 @@ async function populateDatabase() {
         semester: faker.number.int({ min: 1, max: 8 }),
         email: `${faker.internet.userName().toLowerCase()}@eagles.oc.edu`,
         points: 0,
+        password: await bcrypt.hash('defaultpassword', 10),
       });
 
       // Populate related data for each user

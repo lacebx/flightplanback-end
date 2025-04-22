@@ -41,6 +41,13 @@ module.exports = (sequelize, Sequelize) => {
         isEmail: true,
       },
     },
+    password: {
+      type: Sequelize.STRING,
+      allowNull: true, // Initially null for users who haven't set a password yet
+      validate: {
+        len: [8, 100], // Ensure password length is between 8 and 100 characters
+      },
+    },
   });
 
   return User;

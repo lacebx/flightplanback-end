@@ -9,9 +9,7 @@ const dbConfig = require("./app/config/db.config");
 const { faker } = require('@faker-js/faker');
 const db = require("./app/models");
 const adminRoutes = require("./app/routes/admin.routes");
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
-const { google } = require('googleapis');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -110,13 +108,20 @@ app.get(
         console.error("Login error:", err);
         return res.redirect("/");
       }
-      req.session.save((err) => {
+      req.session.save(async (err) => {
         if (err) {
           console.error("Session save error:", err);
           return res.redirect("/");
         }
         console.log("User authenticated successfully:", req.user);
         console.log("User role:", req.user.role);
+
+        // Check if the user needs to set a password
+        if (!req.user.password) {
+          // Redirect to password setup page
+          return res.redirect("http://localhost:8080/setup-password");
+        }
+
         // Redirect based on user role
         if (req.user.role === "admin" || req.user.role === "student staff") {
           res.redirect(`http://localhost:8080/admin`);
@@ -300,101 +305,53 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// Configure nodemailer
-const OAuth2 = google.auth.OAuth2;
+// Endpoint to set password
+app.post('/auth/set-password', async (req, res) => {
+  const { password } = req.body;
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
-const oauth2Client = new OAuth2(
-  process.env.GOOGLE_CLIENT_ID, // Use your existing Google Client ID
-  process.env.GOOGLE_CLIENT_SECRET, // Use your existing Google Client Secret
-  "https://developers.google.com/oauthplayground" // Redirect URL
-);
-
-// Set the credentials using the refresh token you have
-oauth2Client.setCredentials({
-  refresh_token: process.env.REFRESH_TOKEN // Ensure you have this in your .env
-});
-
-// Get the access token
-const accessToken = oauth2Client.getAccessToken();
-
-// Configure nodemailer with OAuth2
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    type: 'OAuth2',
-    user: process.env.EMAIL_USER, // Your email address
-    clientId: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    refreshToken: process.env.REFRESH_TOKEN,
-    accessToken: accessToken
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await db.user.update({ password: hashedPassword }, { where: { id: req.user.id } });
+    res.status(200).json({ message: "Password set successfully" });
+  } catch (err) {
+    console.error("Error setting password:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
-// Endpoint to send magic link
-app.post('/auth/magic-link', (req, res) => {
-  const { email } = req.body;
+// Endpoint for email and password login
+app.post('/auth/login', async (req, res) => {
+  const { email, password } = req.body;
 
-  db.user.findOne({ where: { email } })
-    .then(user => {
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+  try {
+    const user = await db.user.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid password' });
+    }
+
+    req.login(user, function (err) {
+      if (err) {
+        return res.status(500).json({ message: 'Login error' });
       }
-
-      // Generate a unique token
-      const token = crypto.randomBytes(20).toString('hex');
-
-      // Save the token in the database with an expiration time
-      user.magicToken = token;
-      user.magicTokenExpires = Date.now() + 3600000; // 1 hour
-      return user.save();
-    })
-    .then(user => {
-      // Send the magic link email
-      const mailOptions = {
-        to: user.email,
-        from: process.env.EMAIL_USER,
-        subject: 'Your Magic Link',
-        text: `Click the following link to log in: http://localhost:8082/auth/magic-link/${user.magicToken}`,
-      };
-
-      return transporter.sendMail(mailOptions);
-    })
-    .then(() => {
-      res.status(200).json({ message: 'Magic link sent' });
-    })
-    .catch(err => {
-      console.error('Error sending magic link:', err);
-      res.status(500).json({ message: 'Internal server error' });
-    });
-});
-
-// Endpoint to verify magic link
-app.get('/auth/magic-link/:token', (req, res) => {
-  const { token } = req.params;
-
-  db.user.findOne({ where: { magicToken: token, magicTokenExpires: { [Op.gt]: Date.now() } } })
-    .then(user => {
-      if (!user) {
-        return res.status(400).json({ message: 'Magic link is invalid or has expired' });
-      }
-
-      // Log the user in
-      req.login(user, function (err) {
+      req.session.save((err) => {
         if (err) {
-          return res.status(500).json({ message: 'Login error' });
+          return res.status(500).json({ message: 'Session save error' });
         }
-        req.session.save((err) => {
-          if (err) {
-            return res.status(500).json({ message: 'Session save error' });
-          }
-          res.redirect('http://localhost:8080/home');
-        });
+        res.status(200).json({ message: 'Login successful' });
       });
-    })
-    .catch(err => {
-      console.error('Error verifying magic link:', err);
-      res.status(500).json({ message: 'Internal server error' });
     });
+  } catch (err) {
+    console.error('Error during login:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 // Global error handler
