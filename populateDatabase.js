@@ -20,6 +20,31 @@ async function populateDatabase() {
       password: await bcrypt.hash('adminpassword', 10),
     });
 
+    // Add specific users with null password
+    await db.user.create({
+      firstName: 'Mike',
+      lastName: 'Mugisha',
+      major: 'Gynecology',
+      idNumber: '1564348',
+      role: 'student',
+      semester: 8,
+      email: 'm.mugisha@eagles.oc.edu',
+      points: 0,
+      password: null,
+    });
+
+    await db.user.create({
+      firstName: 'Ehitnesh',
+      lastName: 'Tadese',
+      major: 'Computer Science',
+      idNumber: '1599009',
+      role: 'admin',
+      semester: 3,
+      email: 'ehitnesh.kibret@eagles.oc.edu',
+      points: 0,
+      password: null,
+    });
+
     // Populate Users
     for (let i = 0; i < 30; i++) {
       const user = await db.user.create({

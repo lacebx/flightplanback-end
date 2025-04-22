@@ -290,9 +290,15 @@ app.put('/api/tasks/:taskId/complete', (req, res) => {
 // Endpoint to fetch admin dashboard stats
 app.get('/api/admin/stats', async (req, res) => {
   try {
+    console.log('Fetching admin stats from the database...');
     const totalStudents = await db.user.count();
-    const activeEvents = await db.event.count({ where: { eventtype: 'active' } }); // Assuming 'active' is a valid event type
-    const pendingTasks = await db.task.count({ where: { completed: false } }); // Assuming 'completed' is a field in tasks
+    console.log('Total Students:', totalStudents);
+
+    const activeEvents = await db.event.count({ where: { eventtype: 'active' } });
+    console.log('Active Events:', activeEvents);
+
+    const pendingTasks = await db.task.count({ where: { completed: false } });
+    console.log('Pending Tasks:', pendingTasks);
 
     res.json({
       totalStudents,
@@ -301,7 +307,7 @@ app.get('/api/admin/stats', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching admin stats:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 });
 

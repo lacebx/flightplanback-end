@@ -27,8 +27,14 @@
         <button class="show-login" @click="toggleLoginForm">Login wih password.</button>
         <transition name="fade">
           <form v-if="showLoginForm && !showPasswordSetup" @submit.prevent="loginWithEmail" key="login-form">
-            <input type="email" v-model="email" placeholder="Enter your email" required /><br>
-            <input type="password" v-model="password" placeholder="Enter your password" required />
+            <div class="input-group">
+              <label for="email">Email</label>
+              <input id="email" type="email" v-model="email" placeholder="Enter your email" required />
+            </div>
+            <div class="input-group">
+              <label for="password">Password</label>
+              <input id="password" type="password" v-model="password" placeholder="Enter your password" required />
+            </div>
             <button type="submit" class="email-login">Login</button>
           </form>
         </transition>
@@ -260,5 +266,32 @@
   }
   .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
     opacity: 0;
+  }
+  
+  .input-group {
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+  
+  .input-group label {
+    display: block;
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+  }
+  
+  .input-group input::placeholder {
+    color: #cccccc;
   }
   </style>
