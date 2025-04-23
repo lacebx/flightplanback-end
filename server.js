@@ -242,19 +242,29 @@ app.put('/api/events/:eventId/attend', (req, res) => {
   const { eventId } = req.params;
   const { userId } = req.body;
 
+  console.log(`User ${userId} is attending event ${eventId}`);
+
   db.eventAttendance.findOne({ where: { userId, eventId } })
     .then(attendance => {
       if (!attendance) {
+        console.error(`Attendance record not found for user ${userId} and event ${eventId}`);
         return res.status(404).json({ message: 'Attendance record not found' });
       }
 
       attendance.attended = true;
       return attendance.save();
     })
-    .then(() => db.user.findByPk(userId))
-    .then(user => {
-      user.points += 10; // Award points for attending
-      return user.save();
+    .then(() => db.event.findByPk(eventId))
+    .then(event => {
+      if (!event) {
+        console.error(`Event not found with ID ${eventId}`);
+        throw new Error('Event not found');
+      }
+      return db.user.findByPk(userId).then(user => {
+        user.points += event.earnablepoints; // Use earnablepoints from event
+        console.log(`User ${userId} awarded ${event.earnablepoints} points for attending event ${eventId}`);
+        return user.save();
+      });
     })
     .then(() => res.status(200).json({ message: 'Attendance recorded and points awarded' }))
     .catch(err => {
@@ -268,19 +278,29 @@ app.put('/api/tasks/:taskId/complete', (req, res) => {
   const { taskId } = req.params;
   const { userId } = req.body;
 
+  console.log(`User ${userId} is completing task ${taskId}`);
+
   db.taskCompletion.findOne({ where: { userId, taskId } })
     .then(taskCompletion => {
       if (!taskCompletion) {
+        console.error(`Task completion record not found for user ${userId} and task ${taskId}`);
         return res.status(404).json({ message: 'Task completion record not found' });
       }
 
       taskCompletion.completed = true;
       return taskCompletion.save();
     })
-    .then(() => db.user.findByPk(userId))
-    .then(user => {
-      user.points += 5; // Award points for completing a task
-      return user.save();
+    .then(() => db.task.findByPk(taskId))
+    .then(task => {
+      if (!task) {
+        console.error(`Task not found with ID ${taskId}`);
+        throw new Error('Task not found');
+      }
+      return db.user.findByPk(userId).then(user => {
+        user.points += task.earnablepoints; // Use earnablepoints from task
+        console.log(`User ${userId} awarded ${task.earnablepoints} points for completing task ${taskId}`);
+        return user.save();
+      });
     })
     .then(() => res.status(200).json({ message: 'Task marked as completed and points awarded' }))
     .catch(err => {
