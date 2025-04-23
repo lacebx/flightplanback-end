@@ -50,6 +50,9 @@ db.registration.belongsTo(db.user, { foreignKey: 'userId' });
 db.event.hasMany(db.registration, { foreignKey: 'eventId', onDelete: 'CASCADE' });
 db.registration.belongsTo(db.event, { foreignKey: 'eventId' });
 
+db.event.hasMany(db.eventAttendance, { foreignKey: 'eventId', onDelete: 'CASCADE' });
+db.eventAttendance.belongsTo(db.event, { foreignKey: 'eventId' });
+
 db.notification = require('./notification.model.js')(sequelize, Sequelize);
 
 module.exports = db;
