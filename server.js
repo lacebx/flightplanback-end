@@ -10,6 +10,7 @@ const { faker } = require('@faker-js/faker');
 const db = require("./app/models");
 const adminRoutes = require("./app/routes/admin.routes");
 const bcrypt = require('bcrypt');
+const notificationRoutes = require('./app/routes/notification.routes');
 
 const app = express();
 
@@ -197,6 +198,7 @@ app.use("/api/task-completions", taskCompletionRoutes);
 app.use("/api/event-attendances", eventAttendanceRoutes);
 app.use("/api/strengths", strengthRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Endpoint to register for an event
 app.post('/api/events/:eventId/register', (req, res) => {

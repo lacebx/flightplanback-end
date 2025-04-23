@@ -123,6 +123,15 @@ async function populateDatabase() {
       });
     }
 
+    // Populate Notifications
+    for (let i = 0; i < 10; i++) {
+      await db.notification.create({
+        userId: faker.number.int({ min: 1, max: 30 }),
+        message: faker.lorem.sentence(),
+        isRead: faker.datatype.boolean(),
+      });
+    }
+
     console.log("Database populated successfully!");
   } catch (error) {
     console.error("Error populating database:", error);
