@@ -1,73 +1,33 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const db = require("../models");
-const Document = db.document;
+const formidable = require('formidable'); // Import formidable
+const documentController = require('../controllers/document.controller');
 
-// Create a new document
-router.post("/", async (req, res) => {
-    try {
-        const document = await Document.create(req.body);
-        res.status(201).json(document);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+// File upload route using formidable
+router.post('/upload', (req, res) => {
+  const form = new formidable.IncomingForm(); // Create a new form object
+  
+  form.uploadDir = './app/uploads';  // Set the directory where files will be uploaded
+  form.keepExtensions = true;    // Keep the file extension
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to upload file' });
     }
+
+    try {
+      const doc = await documentController.uploadFile(fields, files);
+      res.status(201).json(doc);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 });
 
-// Get all documents
-router.get("/", async (req, res) => {
-    try {
-        const documents = await Document.findAll();
-        res.status(200).json(documents);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
+// CRUD Routes for documents
+router.post('/', documentController.create);
+router.get('/', documentController.findAll);
+router.get('/:id', documentController.findOne);
+router.put('/:id', documentController.update);
+router.delete('/:id', documentController.delete);
 
-// Get a document by ID
-router.get("/:id", async (req, res) => {
-    try {
-        const document = await Document.findByPk(req.params.id);
-        if (document) {
-            res.status(200).json(document);
-        } else {
-            res.status(404).json({ message: "Document not found" });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-// Update a document by ID
-router.put("/:id", async (req, res) => {
-    try {
-        const [updated] = await Document.update(req.body, {
-            where: { documentid: req.params.id }
-        });
-        if (updated) {
-            const updatedDocument = await Document.findByPk(req.params.id);
-            res.status(200).json(updatedDocument);
-        } else {
-            res.status(404).json({ message: "Document not found" });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-// Delete a document by ID
-router.delete("/:id", async (req, res) => {
-    try {
-        const deleted = await Document.destroy({
-            where: { documentid: req.params.id }
-        });
-        if (deleted) {
-            res.status(204).send();
-        } else {
-            res.status(404).json({ message: "Document not found" });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-module.exports = router; 
+module.exports = router;
