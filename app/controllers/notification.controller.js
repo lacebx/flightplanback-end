@@ -7,7 +7,9 @@ exports.sendNotification = async (req, res) => {
     const notification = await db.Notification.create({ userId, message });
     res.status(201).json(notification);
   } catch (error) {
-    console.error('Error sending notification:', error);
+    console.error('Error sending notification:', error.message);
+    console.error('Stack trace:', error.stack);
+    console.error('Error details:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
