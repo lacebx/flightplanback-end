@@ -46,7 +46,11 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
         },
 
-        });
+        earnablepoints: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0,
+        },
+    });
                 
                 
     return Event;

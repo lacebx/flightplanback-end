@@ -38,6 +38,11 @@ exports.findOne = async (req, res) => {
 // Update a task by ID
 exports.update = async (req, res) => {
     try {
+        // Check if the user is an admin
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Forbidden: Only admins can update tasks." });
+        }
+
         const [updated] = await Task.update(req.body, {
             where: { Taskid: req.params.id }
         });

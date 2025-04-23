@@ -48,6 +48,11 @@ module.exports = (sequelize, Sequelize) => {
         len: [8, 100], // Ensure password length is between 8 and 100 characters
       },
     },
+    points: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
   });
 
   return User;

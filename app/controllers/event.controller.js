@@ -38,6 +38,11 @@
     // Update an event by ID
     exports.update = async (req, res) => {
         try {
+            // Check if the user is an admin
+            if (req.user.role !== 'admin') {
+                return res.status(403).json({ message: "Forbidden: Only admins can update events." });
+            }
+
             const [updated] = await Event.update(req.body, {
                 where: { eventid: req.params.id }
             });

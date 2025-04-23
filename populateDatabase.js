@@ -107,6 +107,7 @@ async function populateDatabase() {
         endtime: faker.date.recent(),
         location: faker.location.city(),
         attendancetype: faker.helpers.arrayElement(["online", "offline"]),
+        earnablepoints: faker.helpers.arrayElement([10, 20, 30, 40, 50]),
       });
     }
 
