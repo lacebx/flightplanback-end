@@ -1,11 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const notificationController = require('../controllers/notification.controller');
+const notificationController = require("../controllers/notification.controller");
 
-// Route to send a notification
-router.post('/', notificationController.sendNotification);
-
-// Route to get notifications for a user
-router.get('/:userId', notificationController.getNotifications);
+// Send email notification
+router.post("/email", notificationController.sendEmail);
 
 module.exports = router; 
