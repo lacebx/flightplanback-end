@@ -576,4 +576,33 @@ export default {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
+
+.registered-events-section {
+  margin: 40px auto;
+  max-width: 1200px;
+  padding: 40px;
+  z-index: 1;
+  position: relative;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  white-space: nowrap; /* Prevent line breaks */
+}
+
+.registered-events-grid {
+  display: inline-flex; /* Use inline-flex for horizontal layout */
+  gap: 20px;
+}
+
+.registered-event-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  min-width: 300px; /* Set a minimum width for each card */
+}
+
+.registered-event-card:hover {
+  transform: translateY(-5px);
+}
 </style>

@@ -220,6 +220,8 @@ app.use("/api/admin", adminRoutes);
 
 // Endpoint to register for an event
 app.post('/api/events/:eventId/register', (req, res) => {
+  console.log(`Received POST request to register for event ID: ${req.params.eventId}`);
+  console.log('Request body:', req.body);
   const { eventId } = req.params;
   const { email, isVisible } = req.body;
 

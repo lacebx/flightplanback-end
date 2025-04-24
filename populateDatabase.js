@@ -121,6 +121,18 @@ async function populateDatabase() {
       password: null,
     });
 
+    await createUserWithRelatedData({
+      firstName: 'Toni',
+      lastName: 'Doe',
+      major: 'Undeclared',
+      idNumber: '1599999',
+      role: 'student',
+      semester: 1,
+      email: 'toni25@eagles.oc.edu',
+      points: 0,
+      password: await bcrypt.hash('newpassword', 10),
+    });
+
     // Create 30 random users
     for (let i = 0; i < 30; i++) {
       await createUserWithRelatedData({
