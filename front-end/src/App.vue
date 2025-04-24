@@ -5,7 +5,7 @@
       <TransactionHistory />
     </div>
     <!-- Conditional Navbar -->
-    <header v-if="isAdmin">
+    <header v-if="isAdmin && isAdminView">
       <nav>
         <ul>
           <li>
@@ -16,6 +16,7 @@
           <li><router-link to="/admin/manage-events" class="nav-link">Manage Events</router-link></li>
           <li><router-link to="/admin/manage-students" class="nav-link">Manage Students</router-link></li>
           <li><router-link to="/admin/reports" class="nav-link">Reports</router-link></li>
+          <li><router-link to="/admin/task-approvals" class="nav-link">Task Approvals</router-link></li>
           <li class="nav-link" @click="toggleDropdown">
             Admin View
             <ul v-if="showDropdown" class="dropdown-menu">
@@ -36,7 +37,7 @@
           <li v-if="isAdmin" @click="switchToAdminView" class="nav-link">
             Return to Admin View
           </li>
-          <li class="notification-icon" @click="toggleNotifications">
+          <li class="nav-link notification-icon" @click="toggleNotifications">
             <i class="fas fa-bell"></i>
             <span v-if="unreadNotifications.length" class="notification-count">{{ unreadNotifications.length }}</span>
             <div v-if="showNotifications" class="notification-dropdown">
@@ -82,6 +83,7 @@ export default {
     const unreadNotifications = ref([]);
     const showDropdown = ref(false);
     const userRole = ref(null);
+    const isStudentView = ref(false);
 
     RedemptionPage;
 
@@ -112,7 +114,13 @@ export default {
     
 
     const fetchNotifications = () => {
-      axios.get(`http://localhost:8082/api/notifications/${localStorage.getItem('userId')}`)
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.error('User ID not found in localStorage');
+        return;
+      }
+
+      axios.get(`http://localhost:8082/api/notifications/${userId}`)
         .then(response => {
           unreadNotifications.value = response.data;
         })
@@ -131,10 +139,12 @@ export default {
 
     const switchToStudentView = () => {
       showDropdown.value = false;
+      isStudentView.value = true;
       router.push('/home');
     };
 
     const switchToAdminView = () => {
+      isStudentView.value = false;
       router.push('/admin');
     };
 
@@ -164,7 +174,11 @@ export default {
     const handleLogout = () => {
       isLoggedIn.value = false;
       localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userData');
+      router.push('/');
     };
+    
 
     const setUserPhoto = (photoUrl) => {
       userPhoto.value = photoUrl;
@@ -172,7 +186,11 @@ export default {
 
     const isLoginRoute = computed(() => route.path === '/');
     const isAdmin = computed(() => userRole.value === 'admin');
+    const isAdminView = computed(() => {
+      return isAdmin.value && !isStudentView.value;
+    });
 
+    return { isLoggedIn, handleLogin, handleLogout, isLoginRoute, userPhoto, setUserPhoto, showNotifications, toggleNotifications, unreadNotifications, isAdmin, toggleDropdown, showDropdown, switchToStudentView, switchToAdminView, isAdminView, isStudentView };
     return { isLoggedIn, handleLogin, handleLogout, isLoginRoute, userPhoto, setUserPhoto, showNotifications, toggleNotifications, unreadNotifications, isAdmin, toggleDropdown, showDropdown, switchToStudentView, switchToAdminView };
   },
 };
@@ -229,16 +247,56 @@ nav ul {
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .router-link-active {
   background: rgba(255, 255, 255, 0.2);
   font-weight: bold;
+}
+
+.logout-container {
+  margin-left: auto; /* This pushes the logout button to the right */
+}
+
+.logout-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .logout-container {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
 }
 
 /* MAIN CONTENT */

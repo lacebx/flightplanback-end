@@ -51,4 +51,32 @@ exports.sendEmail = async (req, res) => {
     console.error('Error sending email:', error);
     res.status(500).json({ message: "Failed to send email" });
   }
+};
+
+exports.sendNotification = async (req, res) => {
+  try {
+    const { studentId, message, studentName } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ message: "Message is required" });
+    }
+
+    // Verify the user exists
+    const user = await db.user.findByPk(studentId);
+    if (!user) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Save notification to the database
+    await db.notification.create({
+      userId: studentId,
+      message: `Hello ${studentName}, ${message}`,
+      isRead: false
+    });
+
+    res.status(200).json({ message: "Notification sent successfully" });
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    res.status(500).json({ message: "Failed to send notification" });
+  }
 }; 
