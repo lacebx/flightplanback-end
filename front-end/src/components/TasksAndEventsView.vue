@@ -17,8 +17,8 @@
           <p>{{ task.description }}</p>
           <p><strong>Earnable Points:</strong> {{ task.earnablepoints }}</p>
           <p><strong>Schedule:</strong> {{ task.schedulingtype }}</p>
-          <button class="complete-btn" @click="completeTask(task)" :disabled="task.completed">
-            <span v-if="!task.completed">Complete</span>
+          <button class="complete-btn" @click="requestTaskCompletionApproval(task)" :disabled="task.completed">
+            <span v-if="!task.completed">Request Completion</span>
             <span v-else>Completed <i class="fas fa-check"></i></span>
           </button>
         </div>
@@ -181,12 +181,20 @@ export default {
           console.error('Error fetching registered events:', error);
         });
     },
-    async completeTask(task) {
+    async requestTaskCompletionApproval(task) {
       try {
-        await axios.put(`http://localhost:8082/api/tasks/${task.Taskid}/complete`, { userId: this.userProfile.id }, { withCredentials: true });
-        this.tasks = this.tasks.filter(t => t.Taskid !== task.Taskid);
+        const response = await axios.post(
+          `http://localhost:8082/api/tasks/${task.Taskid}/request-completion`,
+          { userId: this.userProfile.id },
+          { withCredentials: true }
+        );
+        console.log('Task completion request sent:', response.data);
+        this.notification = 'Task completion request sent to admin.';
+        setTimeout(() => {
+          this.notification = null;
+        }, 3000);
       } catch (error) {
-        console.error('Error completing task:', error);
+        console.error('Error requesting task completion approval:', error);
       }
     },
     openRegistrationModal(eventId) {
@@ -254,6 +262,9 @@ export default {
         .catch(error => {
           console.error('Error fetching user profile:', error);
         });
+    },
+    removeTask(taskId) {
+      this.tasks = this.tasks.filter(task => task.Taskid !== taskId);
     }
   },
   mounted() {
@@ -282,10 +293,14 @@ export default {
         this.notification = null;
       }, 3000);
     });
+
+    // Listen for the taskApproved event using mitt
+    eventBus.on('taskApproved', this.removeTask);
   },
   beforeUnmount() {
     // Clean up the event listener
     eventBus.off('eventAdded');
+    eventBus.off('taskApproved', this.removeTask);
   }
 };
 </script> 
