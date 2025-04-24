@@ -182,6 +182,7 @@ const userRoutes = require("./app/routes/user.routes");
 const taskCompletionRoutes = require("./app/routes/taskCompletion.routes");
 const eventAttendanceRoutes = require("./app/routes/eventAttendance.routes");
 const strengthRoutes = require("./app/routes/strength.routes");
+const notificationRoutes = require("./app/routes/notification.routes");
 
 // Use routes
 app.use("/api/awards", awardRoutes);
@@ -196,6 +197,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/task-completions", taskCompletionRoutes);
 app.use("/api/event-attendances", eventAttendanceRoutes);
 app.use("/api/strengths", strengthRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Endpoint to register for an event
