@@ -112,7 +112,12 @@ export default {
     
 
     const fetchNotifications = () => {
-      axios.get(`http://localhost:8082/api/notifications/${localStorage.getItem('userId')}`)
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.warn('No user ID found');
+        return;
+      }
+      axios.get(`http://localhost:8082/api/notifications/${userId}`)
         .then(response => {
           unreadNotifications.value = response.data;
         })
@@ -173,7 +178,24 @@ export default {
     const isLoginRoute = computed(() => route.path === '/');
     const isAdmin = computed(() => userRole.value === 'admin');
 
-    return { isLoggedIn, handleLogin, handleLogout, isLoginRoute, userPhoto, setUserPhoto, showNotifications, toggleNotifications, unreadNotifications, isAdmin, toggleDropdown, showDropdown, switchToStudentView, switchToAdminView };
+    const fetchUserPoints = async () => {
+      try {
+        const response = await axios.get('http://localhost:8082/auth/user', { withCredentials: true });
+        if (response.data && response.data.points !== undefined) {
+          this.userPoints = response.data.points;
+        } else {
+          console.warn('User points not found in response');
+          this.userPoints = 0;
+        }
+        this.loading = false;
+      } catch (error) {
+        console.error('Error fetching user points:', error);
+        this.userPoints = 0;
+        this.loading = false;
+      }
+    };
+
+    return { isLoggedIn, handleLogin, handleLogout, isLoginRoute, userPhoto, setUserPhoto, showNotifications, toggleNotifications, unreadNotifications, isAdmin, toggleDropdown, showDropdown, switchToStudentView, switchToAdminView, fetchUserPoints };
   },
 };
 </script>

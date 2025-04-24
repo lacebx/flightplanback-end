@@ -137,12 +137,30 @@ app.get(
 );
 
 // Protected route to fetch authenticated user info
-app.get("/auth/user", (req, res) => {
+app.get("/auth/user", async (req, res) => {
   console.log("Session:", req.session);
   console.log("req.isAuthenticated():", req.isAuthenticated());
   if (req.isAuthenticated()) {
-    res.json(req.user);
+    try {
+      console.log("User ID from session:", req.user.id);
+      // Fetch the complete user data from the database
+      const user = await db.user.findByPk(req.user.id);
+      if (!user) {
+        console.log("User not found in database");
+        return res.status(404).json({ message: "User not found" });
+      }
+      console.log("User data from database:", {
+        id: user.id,
+        email: user.email,
+        points: user.points
+      });
+      res.json(user);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   } else {
+    console.log("User not authenticated");
     res.status(401).json({ message: "Unauthorized" });
   }
 });
