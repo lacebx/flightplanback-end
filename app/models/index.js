@@ -55,4 +55,13 @@ db.eventAttendance.belongsTo(db.event, { foreignKey: 'eventId' });
 
 db.notification = require('./notification.model.js')(sequelize, Sequelize);
 
+db.taskCompletionRequest = require('./taskCompletionRequest.js')(sequelize, Sequelize);
+
+// Define associations for taskCompletionRequest
+db.user.hasMany(db.taskCompletionRequest, { foreignKey: 'userId', onDelete: 'CASCADE' });
+db.taskCompletionRequest.belongsTo(db.user, { foreignKey: 'userId' });
+
+db.task.hasMany(db.taskCompletionRequest, { foreignKey: 'taskId', onDelete: 'CASCADE' });
+db.taskCompletionRequest.belongsTo(db.task, { foreignKey: 'taskId' });
+
 module.exports = db;

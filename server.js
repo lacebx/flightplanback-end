@@ -382,6 +382,87 @@ app.post('/auth/login', async (req, res) => {
   }
 });
 
+// Endpoint to request task completion approval
+app.post('/api/tasks/:taskId/request-completion', (req, res) => {
+  console.log(`Received request to complete task with ID: ${req.params.taskId} for user ID: ${req.body.userId}`);
+  const { taskId } = req.params;
+  const { userId } = req.body;
+
+  // Create a task completion request
+  db.taskCompletionRequest.create({
+    userId,
+    taskId,
+    status: 'pending'
+  })
+  .then(() => {
+    // Notify admin about the new task completion request
+    db.notification.create({
+      userId: 1, // Assuming admin has userId 1
+      message: `Task completion request for task ID ${taskId} from user ID ${userId}`,
+      isRead: false
+    });
+    res.status(200).json({ message: 'Task completion request sent to admin.' });
+  })
+  .catch(err => {
+    console.error('Error creating task completion request:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  });
+});
+
+// Endpoint for admin to approve task completion
+app.put('/api/tasks/:taskId/approve-completion', (req, res) => {
+  const { taskId } = req.params;
+  const { userId } = req.body;
+
+  db.taskCompletionRequest.findOne({ where: { userId, taskId, status: 'pending' } })
+    .then(request => {
+      if (!request) {
+        return res.status(404).json({ message: 'Task completion request not found' });
+      }
+
+      // Approve the task completion
+      request.status = 'approved';
+      return request.save();
+    })
+    .then(() => db.task.findByPk(taskId))
+    .then(task => {
+      if (!task) {
+        throw new Error('Task not found');
+      }
+      return db.user.findByPk(userId).then(user => {
+        user.points += task.earnablepoints;
+        return user.save();
+      });
+    })
+    .then(() => {
+      // Notify user about the approval
+      db.notification.create({
+        userId,
+        message: `Your task completion for task ID ${taskId} has been approved.`,
+        isRead: false
+      });
+      res.status(200).json({ message: 'Task completion approved and points awarded' });
+    })
+    .catch(err => {
+      console.error('Error approving task completion:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+// Endpoint to fetch pending task approvals
+app.get('/api/admin/pending-task-approvals', async (req, res) => {
+  try {
+    const pendingApprovals = await db.taskCompletionRequest.findAll({
+      where: { status: 'pending' },
+      include: [db.user, db.task] // Include related user and task data if needed
+    });
+    res.json(pendingApprovals);
+  } catch (error) {
+    console.error('Error fetching pending task approvals:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
